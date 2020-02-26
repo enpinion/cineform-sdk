@@ -23,6 +23,7 @@
 *
 */
 #include <stdio.h>  //need to remove these dependencies for the embedded decoder.
+#include <ctype.h> // isspace()
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -118,8 +119,23 @@ int main(int argc, char **argv)
 			i = 0;
 			while (i < len && count < 2)
 			{
-				if (header[i] == 10)
-					count++;
+				if (header[i] == 35 ) // '#'
+				{
+					while(header[i] != 10)
+					{
+            i++;
+          }
+          // Hacky but works.
+          if(header[i+1] == 35)
+					{
+						i++;
+					}
+          continue;
+        }
+        if (isspace(header[i]))
+				{
+          count++;
+				}
 
 				i++;
 			}
@@ -149,10 +165,10 @@ int main(int argc, char **argv)
 
 			if(w && h && w < 16384 && h < 16384)
 			{
-                buffer = malloc(w*h+256);
+                buffer = (unsigned char*)malloc(w*h+256);
 				if(buffer)
 				{
-                    dest = malloc(w*h+256);
+                    dest = (unsigned char*)malloc(w*h+256);
 					if(dest)
 					{
 						int lowpass_w=0, lowpass_h=0;
@@ -177,10 +193,10 @@ int main(int argc, char **argv)
 
 							memcpy(dest, buffer, header_length);
 
-							buffA = malloc(w*h * 4);
-							buffB = malloc(w*h * 4);
-							buffS = malloc(w*h * 4);
-							buffD = malloc(w*h * 4);
+							buffA = (int*)malloc(w*h * 4);
+							buffB = (int*)malloc(w*h * 4);
+							buffS = (int*)malloc(w*h * 4);
+							buffD = (int*)malloc(w*h * 4);
 
 							if (buffA && buffB && buffS && buffD)
 							{
